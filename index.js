@@ -8,6 +8,39 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// mongoDB
+
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.8rcwewi.mongodb.net/?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverApi: ServerApiVersion.v1,
+});
+
+async function run() {
+  try {
+    await client.connect();
+  } finally {
+  }
+}
+run().catch((error) => console.log(error));
+
+const carSomethingCollection = client
+  .db("buy-sell-car-project")
+  .collection("car-something");
+
+// car something collection for get api
+app.get("/car-something", async (req, res) => {
+  try {
+    const query = {};
+    const result = await carSomethingCollection.find(query).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
 app.get("/", (req, res) => {
   res.send("Welcome from buy sell store car server.");
 });
