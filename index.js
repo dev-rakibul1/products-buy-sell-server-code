@@ -34,6 +34,10 @@ const microSomethingCollection = client
   .db("buy-sell-car-project")
   .collection("micro-something");
 
+const electSomethingCollection = client
+  .db("buy-sell-car-project")
+  .collection("elect-something");
+
 // car something collection for get api
 app.get("/car-something", async (req, res) => {
   try {
@@ -50,6 +54,20 @@ app.get("/micro-something", async (req, res) => {
   try {
     const query = {};
     const result = await microSomethingCollection
+      .find(query)
+      .limit(3)
+      .toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// elect something collection for get api
+app.get("/elect-something", async (req, res) => {
+  try {
+    const query = {};
+    const result = await electSomethingCollection
       .find(query)
       .limit(3)
       .toArray();
