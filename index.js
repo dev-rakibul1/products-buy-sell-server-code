@@ -30,11 +30,29 @@ const carSomethingCollection = client
   .db("buy-sell-car-project")
   .collection("car-something");
 
+const microSomethingCollection = client
+  .db("buy-sell-car-project")
+  .collection("micro-something");
+
 // car something collection for get api
 app.get("/car-something", async (req, res) => {
   try {
     const query = {};
-    const result = await carSomethingCollection.find(query).toArray();
+    const result = await carSomethingCollection.find(query).limit(3).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// Micro something collection for get api
+app.get("/micro-something", async (req, res) => {
+  try {
+    const query = {};
+    const result = await microSomethingCollection
+      .find(query)
+      .limit(3)
+      .toArray();
     res.send(result);
   } catch (e) {
     console.log(e.message);
