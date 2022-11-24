@@ -35,6 +35,8 @@ const microSomethingCollection = client
   .collection("micro-something");
 
 const microCollection = client.db("buy-sell-car-project").collection("micro");
+const electCollection = client.db("buy-sell-car-project").collection("elect");
+const carCollection = client.db("buy-sell-car-project").collection("car");
 
 const electSomethingCollection = client
   .db("buy-sell-car-project")
@@ -45,6 +47,17 @@ app.get("/car-something", async (req, res) => {
   try {
     const query = {};
     const result = await carSomethingCollection.find(query).limit(3).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+//all car collection for get api
+app.get("/all-car", async (req, res) => {
+  try {
+    const query = {};
+    const result = await carCollection.find(query).toArray();
     res.send(result);
   } catch (e) {
     console.log(e.message);
@@ -84,6 +97,17 @@ app.get("/elect-something", async (req, res) => {
       .find(query)
       .limit(3)
       .toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+//all elect collection for get api
+app.get("/all-elect", async (req, res) => {
+  try {
+    const query = {};
+    const result = await electCollection.find(query).toArray();
     res.send(result);
   } catch (e) {
     console.log(e.message);
