@@ -3,14 +3,13 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
+const { MongoClient, ServerApiVersion } = require("mongodb");
 
 // middle ware
 app.use(cors());
 app.use(express.json());
 
 // mongoDB
-
-const { MongoClient, ServerApiVersion } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.8rcwewi.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -26,6 +25,7 @@ async function run() {
 }
 run().catch((error) => console.log(error));
 
+// ======================ALL DB COLLECTION HERE==========================
 const carSomethingCollection = client
   .db("buy-sell-car-project")
   .collection("car-something");
@@ -33,6 +33,8 @@ const carSomethingCollection = client
 const microSomethingCollection = client
   .db("buy-sell-car-project")
   .collection("micro-something");
+
+const microCollection = client.db("buy-sell-car-project").collection("micro");
 
 const electSomethingCollection = client
   .db("buy-sell-car-project")
@@ -57,6 +59,17 @@ app.get("/micro-something", async (req, res) => {
       .find(query)
       .limit(3)
       .toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+//All Micro  collection for get api
+app.get("/all-micro", async (req, res) => {
+  try {
+    const query = {};
+    const result = await microCollection.find(query).toArray();
     res.send(result);
   } catch (e) {
     console.log(e.message);
