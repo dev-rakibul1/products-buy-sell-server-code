@@ -3,7 +3,7 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 // middle ware
 app.use(cors());
@@ -53,6 +53,20 @@ app.get("/car-something", async (req, res) => {
   }
 });
 
+// temporary  location add in the DB
+// app.get("/all-micro", async (req, res) => {
+//   const filter = {};
+//   const options = { upsert: true };
+//   const updateDoc = {
+//     $set: {
+//       location: "Chittagong, Bangladesh",
+//     },
+//   };
+
+//   const result = await microCollection.updateMany(filter, updateDoc, options);
+//   res.send(result);
+// });
+
 //all car collection for get api
 app.get("/all-car", async (req, res) => {
   try {
@@ -83,6 +97,41 @@ app.get("/all-micro", async (req, res) => {
   try {
     const query = {};
     const result = await microCollection.find(query).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+// single micro api
+app.get("/all-micro/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await microCollection.findOne(query);
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// single micro api
+app.get("/all-elect/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await electCollection.findOne(query);
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// single micro api
+app.get("/all-car/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await carCollection.findOne(query);
     res.send(result);
   } catch (e) {
     console.log(e.message);
