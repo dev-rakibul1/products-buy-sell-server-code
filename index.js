@@ -181,6 +181,16 @@ app.get("/user-booking-information", async (req, res) => {
   }
 });
 
+app.get("/users", async (req, res) => {
+  try {
+    const query = {};
+    const result = await usersCollection.find(query).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
 // ========================ALL POST METHOD =========================
 
 app.post("/users", async (req, res) => {
@@ -271,6 +281,29 @@ app.delete("/user-booking-information/:id", async (req, res) => {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await userBookingInformation.deleteOne(query);
+    console.log(result);
+
+    if (result.deletedCount) {
+      res.send({
+        success: true,
+        message: "Delete successfully",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Delete fail!",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// delete user/ admin buyer, seller
+app.delete("/users/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await usersCollection.deleteOne(query);
     console.log(result);
 
     if (result.deletedCount) {
