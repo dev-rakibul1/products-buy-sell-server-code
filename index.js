@@ -42,6 +42,11 @@ const electSomethingCollection = client
   .db("buy-sell-car-project")
   .collection("elect-something");
 
+const usersCollection = client.db("buy-sell-car-project").collection("users");
+const newProductCollection = client
+  .db("buy-sell-car-project")
+  .collection("new-products");
+
 // car something collection for get api
 app.get("/car-something", async (req, res) => {
   try {
@@ -157,6 +162,59 @@ app.get("/all-elect", async (req, res) => {
   try {
     const query = {};
     const result = await electCollection.find(query).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// ========================ALL POST METHOD =========================
+
+app.post("/users", async (req, res) => {
+  try {
+    const query = req.body;
+    const result = await usersCollection.insertOne(query);
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+app.post("/new-products", async (req, res) => {
+  try {
+    const query = req.body;
+    const result = await newProductCollection.insertOne(query);
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// seller new electronic product added
+app.post("/all-elect", async (req, res) => {
+  try {
+    const query = req.body;
+    const result = await electCollection.insertOne(query);
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+// seller new product added
+app.post("/all-micro", async (req, res) => {
+  try {
+    const query = req.body;
+    const result = await microCollection.insertOne(query);
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+// seller new product added
+app.post("/all-car", async (req, res) => {
+  try {
+    const query = req.body;
+    const result = await carCollection.insertOne(query);
     res.send(result);
   } catch (e) {
     console.log(e.message);
