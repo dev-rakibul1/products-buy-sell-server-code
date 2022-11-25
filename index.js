@@ -221,6 +221,17 @@ app.post("/all-car", async (req, res) => {
   }
 });
 
+//  =================GET SINGLE USER FORM DATABASE ===================
+app.get("/users/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+    const user = await usersCollection.findOne({ email });
+    res.send(user);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
 app.get("/", (req, res) => {
   res.send("Welcome from buy sell store car server.");
 });
