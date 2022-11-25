@@ -37,6 +37,9 @@ const microSomethingCollection = client
 const microCollection = client.db("buy-sell-car-project").collection("micro");
 const electCollection = client.db("buy-sell-car-project").collection("elect");
 const carCollection = client.db("buy-sell-car-project").collection("car");
+const userBookingInformation = client
+  .db("buy-sell-car-project")
+  .collection("user-booking-information");
 
 const electSomethingCollection = client
   .db("buy-sell-car-project")
@@ -168,6 +171,16 @@ app.get("/all-elect", async (req, res) => {
   }
 });
 
+app.get("/user-booking-information", async (req, res) => {
+  try {
+    const query = {};
+    const result = await userBookingInformation.find(query).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
 // ========================ALL POST METHOD =========================
 
 app.post("/users", async (req, res) => {
@@ -220,6 +233,26 @@ app.post("/all-car", async (req, res) => {
     console.log(e.message);
   }
 });
+//user-booking-information
+app.post("/user-booking-information", async (req, res) => {
+  try {
+    const query = req.body;
+    const result = await userBookingInformation.insertOne(query);
+
+    if (result.acknowledged) {
+      res.send({
+        success: true,
+        message: "Booking successfully",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Booking fail!",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
 
 //  =================GET SINGLE USER FORM DATABASE ===================
 app.get("/users/:email", async (req, res) => {
@@ -227,6 +260,29 @@ app.get("/users/:email", async (req, res) => {
     const email = req.params.email;
     const user = await usersCollection.findOne({ email });
     res.send(user);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+//  =================ALL DELETE METHOD ===================
+app.delete("/user-booking-information/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await userBookingInformation.deleteOne(query);
+    console.log(result);
+
+    if (result.deletedCount) {
+      res.send({
+        success: true,
+        message: "Delete successfully",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Delete fail!",
+      });
   } catch (e) {
     console.log(e.message);
   }
