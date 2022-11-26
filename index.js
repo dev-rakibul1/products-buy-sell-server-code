@@ -38,6 +38,9 @@ const microCollection = client.db("buy-sell-car-project").collection("micro");
 const electCollection = client.db("buy-sell-car-project").collection("elect");
 const carCollection = client.db("buy-sell-car-project").collection("car");
 const blogCollection = client.db("buy-sell-car-project").collection("blog");
+const wishlistCollection = client
+  .db("buy-sell-car-project")
+  .collection("user-wishlist");
 const userBookingInformation = client
   .db("buy-sell-car-project")
   .collection("user-booking-information");
@@ -202,6 +205,17 @@ app.get("/blog", async (req, res) => {
   }
 });
 
+// Blog api
+app.get("/user-wishlist", async (req, res) => {
+  try {
+    const query = {};
+    const result = await wishlistCollection.find(query).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
 // ========================ALL POST METHOD =========================
 
 app.post("/users", async (req, res) => {
@@ -275,6 +289,27 @@ app.post("/user-booking-information", async (req, res) => {
   }
 });
 
+//user wishlist API
+app.post("/user-wishlist", async (req, res) => {
+  try {
+    const query = req.body;
+    const result = await wishlistCollection.insertOne(query);
+
+    if (result.acknowledged) {
+      res.send({
+        success: true,
+        message: "Product add successfully your favourite list",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Products added fail!",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
 //  =================GET SINGLE USER FORM DATABASE ===================
 app.get("/users/:email", async (req, res) => {
   try {
@@ -315,6 +350,29 @@ app.delete("/users/:id", async (req, res) => {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await usersCollection.deleteOne(query);
+    console.log(result);
+
+    if (result.deletedCount) {
+      res.send({
+        success: true,
+        message: "Delete successfully",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Delete fail!",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// delete from user wishlist
+app.delete("/user-wishlist/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await wishlistCollection.deleteOne(query);
     console.log(result);
 
     if (result.deletedCount) {
