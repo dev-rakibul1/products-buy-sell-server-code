@@ -38,6 +38,9 @@ const microCollection = client.db("buy-sell-car-project").collection("micro");
 const electCollection = client.db("buy-sell-car-project").collection("elect");
 const carCollection = client.db("buy-sell-car-project").collection("car");
 const blogCollection = client.db("buy-sell-car-project").collection("blog");
+const userReportCollection = client
+  .db("buy-sell-car-project")
+  .collection("user-report");
 const wishlistCollection = client
   .db("buy-sell-car-project")
   .collection("user-wishlist");
@@ -205,11 +208,22 @@ app.get("/blog", async (req, res) => {
   }
 });
 
-// Blog api
+// user wishlist get api
 app.get("/user-wishlist", async (req, res) => {
   try {
     const query = {};
     const result = await wishlistCollection.find(query).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// user report get api
+app.get("/user-report", async (req, res) => {
+  try {
+    const query = {};
+    const result = await userReportCollection.find(query).toArray();
     res.send(result);
   } catch (e) {
     console.log(e.message);
@@ -310,6 +324,27 @@ app.post("/user-wishlist", async (req, res) => {
   }
 });
 
+//user report API
+app.post("/user-report", async (req, res) => {
+  try {
+    const query = req.body;
+    const result = await userReportCollection.insertOne(query);
+
+    if (result.acknowledged) {
+      res.send({
+        success: true,
+        message: "Report send successfully",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Report send fail!",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
 //  =================GET SINGLE USER FORM DATABASE ===================
 app.get("/users/:email", async (req, res) => {
   try {
@@ -367,7 +402,7 @@ app.delete("/users/:id", async (req, res) => {
   }
 });
 
-// delete from user wishlist
+// delete user from wishlist
 app.delete("/user-wishlist/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -384,6 +419,98 @@ app.delete("/user-wishlist/:id", async (req, res) => {
       res.send({
         success: false,
         error: "Delete fail!",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// delete user from report list
+app.delete("/user-report/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await userReportCollection.deleteOne(query);
+    console.log(result);
+
+    if (result.deletedCount) {
+      res.send({
+        success: true,
+        message: "Report delete successfully",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Report delete fail!",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// delete my product from db
+app.delete("/all-elect/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await electCollection.deleteOne(query);
+    console.log(result);
+
+    if (result.deletedCount) {
+      res.send({
+        success: true,
+        message: "Product delete successfully",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Product delete fail!",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// delete my product from db
+app.delete("/all-micro/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await microCollection.deleteOne(query);
+    console.log(result);
+
+    if (result.deletedCount) {
+      res.send({
+        success: true,
+        message: "Product delete successfully",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Product delete fail!",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// delete my product from db (All Luxurious Car)
+app.delete("/all-car/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await carCollection.deleteOne(query);
+    console.log(result);
+
+    if (result.deletedCount) {
+      res.send({
+        success: true,
+        message: "Product delete successfully",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Product delete fail!",
       });
   } catch (e) {
     console.log(e.message);
