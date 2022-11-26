@@ -37,6 +37,7 @@ const microSomethingCollection = client
 const microCollection = client.db("buy-sell-car-project").collection("micro");
 const electCollection = client.db("buy-sell-car-project").collection("elect");
 const carCollection = client.db("buy-sell-car-project").collection("car");
+const blogCollection = client.db("buy-sell-car-project").collection("blog");
 const userBookingInformation = client
   .db("buy-sell-car-project")
   .collection("user-booking-information");
@@ -185,6 +186,16 @@ app.get("/users", async (req, res) => {
   try {
     const query = {};
     const result = await usersCollection.find(query).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+// Blog api
+app.get("/blog", async (req, res) => {
+  try {
+    const query = {};
+    const result = await blogCollection.find(query).toArray();
     res.send(result);
   } catch (e) {
     console.log(e.message);
