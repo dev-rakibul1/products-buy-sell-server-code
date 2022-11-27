@@ -4,10 +4,38 @@ const cors = require("cors");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const jwt = require("jsonwebtoken");
 
 // middle ware
 app.use(cors());
 app.use(express.json());
+
+function verifyToken(req, res, next) {
+  const authorization = req.headers.authorization;
+
+  if (!authorization) {
+    return res.status(401).send({
+      status: 401,
+      message: "unauthorized request",
+    });
+  }
+
+  const token = authorization.split(" ")[1];
+  console.log(token);
+
+  // verify the token
+  jwt.verify(token, process.env.JWT_TOKEN_KEY, function (err, decoded) {
+    if (err) {
+      return res.status(401).send({
+        message: "Invalid token",
+        status: 401,
+      });
+    }
+
+    req.decoded = decoded;
+  });
+  return next();
+}
 
 // mongoDB
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.8rcwewi.mongodb.net/?retryWrites=true&w=majority`;
@@ -66,6 +94,62 @@ const usersCollection = client.db("buy-sell-car-project").collection("users");
 const newProductCollection = client
   .db("buy-sell-car-project")
   .collection("new-products");
+
+// ========================JSON WEB TOKEN USING HERE=============================
+app.put("/users/:email", async (req, res) => {
+  try {
+    // const email = req.params.email;
+    // const name = req.body.name;
+    // const image = req.body.image;
+    // const role = req.body.role;
+    // // console.log(email, name, image, role);
+    // const user = req.body;
+
+    // const filter = { email: email };
+    // const options = { upsert: true };
+    // const updateDoc = {
+    //   $set: {
+    //     email: email,
+    //     name: name,
+    //     image: image,
+    //     role: role,
+    //   },
+    // };
+
+    const email = req.params.email;
+    const name = req.body.name;
+    const image = req.body.image;
+    const role = req.body.role;
+    console.log(email);
+    const user = req.body;
+
+    const filter = { email: email };
+    const options = { upsert: true };
+    const updateDoc = {
+      $set: {
+        email: email,
+        name: name,
+        image: image,
+        role: role,
+      },
+    };
+    const result = await usersCollection.updateOne(filter, updateDoc, options);
+
+    // jwt token
+    const token = jwt.sign({ email: email }, process.env.JWT_TOKEN_KEY, {
+      expiresIn: "1h",
+    });
+
+    res.send({
+      status: "success",
+      message: "Token create successfully",
+      data: token,
+    });
+    console.log(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
 
 // car something collection for get api
 app.get("/car-something", async (req, res) => {
@@ -257,7 +341,18 @@ app.post("/users", async (req, res) => {
   try {
     const query = req.body;
     const result = await usersCollection.insertOne(query);
-    res.send(result);
+    // res.send(result);
+
+    if (result.acknowledged) {
+      res.send({
+        success: true,
+        message: "User added successfully in DB",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "User added fail in DB!",
+      });
   } catch (e) {
     console.log(e.message);
   }
@@ -388,7 +483,7 @@ app.post("/advertise", async (req, res) => {
 });
 
 //  =================GET SINGLE USER FORM DATABASE ===================
-app.get("/users/:email", async (req, res) => {
+app.get("/users/:email", verifyToken, async (req, res) => {
   try {
     const email = req.params.email;
     const user = await usersCollection.findOne({ email });
@@ -399,12 +494,12 @@ app.get("/users/:email", async (req, res) => {
 });
 
 //  =================ALL DELETE METHOD ===================
-app.delete("/user-booking-information/:id", async (req, res) => {
+app.delete("/user-booking-information/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await userBookingInformation.deleteOne(query);
-    console.log(result);
+    // console.log(result);
 
     if (result.deletedCount) {
       res.send({
@@ -422,12 +517,12 @@ app.delete("/user-booking-information/:id", async (req, res) => {
 });
 
 // delete user/ admin buyer, seller
-app.delete("/users/:id", async (req, res) => {
+app.delete("/users/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await usersCollection.deleteOne(query);
-    console.log(result);
+    // console.log(result);
 
     if (result.deletedCount) {
       res.send({
@@ -445,12 +540,12 @@ app.delete("/users/:id", async (req, res) => {
 });
 
 // delete user from wishlist
-app.delete("/user-wishlist/:id", async (req, res) => {
+app.delete("/user-wishlist/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await wishlistCollection.deleteOne(query);
-    console.log(result);
+    // console.log(result);
 
     if (result.deletedCount) {
       res.send({
@@ -468,12 +563,12 @@ app.delete("/user-wishlist/:id", async (req, res) => {
 });
 
 // delete user from report list
-app.delete("/user-report/:id", async (req, res) => {
+app.delete("/user-report/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await userReportCollection.deleteOne(query);
-    console.log(result);
+    // console.log(result);
 
     if (result.deletedCount) {
       res.send({
@@ -491,12 +586,12 @@ app.delete("/user-report/:id", async (req, res) => {
 });
 
 // delete my product from db
-app.delete("/all-elect/:id", async (req, res) => {
+app.delete("/all-elect/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await electCollection.deleteOne(query);
-    console.log(result);
+    // console.log(result);
 
     if (result.deletedCount) {
       res.send({
@@ -514,12 +609,12 @@ app.delete("/all-elect/:id", async (req, res) => {
 });
 
 // delete my product from db
-app.delete("/all-micro/:id", async (req, res) => {
+app.delete("/all-micro/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await microCollection.deleteOne(query);
-    console.log(result);
+    // console.log(result);
 
     if (result.deletedCount) {
       res.send({
@@ -537,12 +632,12 @@ app.delete("/all-micro/:id", async (req, res) => {
 });
 
 // delete my product from db (All Luxurious Car)
-app.delete("/all-car/:id", async (req, res) => {
+app.delete("/all-car/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await carCollection.deleteOne(query);
-    console.log(result);
+    // console.log(result);
 
     if (result.deletedCount) {
       res.send({
@@ -560,14 +655,14 @@ app.delete("/all-car/:id", async (req, res) => {
 });
 
 // Delete product from advertisement
-app.delete("/advertise/:id", async (req, res) => {
+app.delete("/advertise/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
-    console.log(id);
+    // console.log(id);
     const query = { _id: ObjectId(id) };
     const result = await advertiseCollection.deleteOne(query);
-    console.log(result);
-    console.log(result);
+    // console.log(result);
+    // console.log(result);
 
     if (result.deletedCount) {
       res.send({
@@ -585,7 +680,7 @@ app.delete("/advertise/:id", async (req, res) => {
 });
 
 // =================== ALL PUT METHOD==================
-app.put("/users/admin/:id", async (req, res) => {
+app.put("/users/admin/:id", verifyToken, async (req, res) => {
   const id = req.params.id;
   const filter = { _id: ObjectId(id) };
 
@@ -597,7 +692,7 @@ app.put("/users/admin/:id", async (req, res) => {
     },
   };
   const result = await usersCollection.updateOne(filter, updateDoc, options);
-  console.log(result);
+  // console.log(result);
 
   if (result.acknowledged) {
     res.send({
