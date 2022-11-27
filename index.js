@@ -35,15 +35,24 @@ const microSomethingCollection = client
   .collection("micro-something");
 
 const microCollection = client.db("buy-sell-car-project").collection("micro");
+
 const electCollection = client.db("buy-sell-car-project").collection("elect");
+
 const carCollection = client.db("buy-sell-car-project").collection("car");
+
 const blogCollection = client.db("buy-sell-car-project").collection("blog");
+const advertiseCollection = client
+  .db("buy-sell-car-project")
+  .collection("advertise");
+
 const userReportCollection = client
   .db("buy-sell-car-project")
   .collection("user-report");
+
 const wishlistCollection = client
   .db("buy-sell-car-project")
   .collection("user-wishlist");
+
 const userBookingInformation = client
   .db("buy-sell-car-project")
   .collection("user-booking-information");
@@ -53,6 +62,7 @@ const electSomethingCollection = client
   .collection("elect-something");
 
 const usersCollection = client.db("buy-sell-car-project").collection("users");
+
 const newProductCollection = client
   .db("buy-sell-car-project")
   .collection("new-products");
@@ -230,6 +240,17 @@ app.get("/user-report", async (req, res) => {
   }
 });
 
+// user report get api
+app.get("/advertise", async (req, res) => {
+  try {
+    const query = {};
+    const result = await advertiseCollection.find(query).toArray();
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
 // ========================ALL POST METHOD =========================
 
 app.post("/users", async (req, res) => {
@@ -339,6 +360,27 @@ app.post("/user-report", async (req, res) => {
       res.send({
         success: false,
         error: "Report send fail!",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+//Advertisement products api
+app.post("/advertise", async (req, res) => {
+  try {
+    const query = req.body;
+    const result = await advertiseCollection.insertOne(query);
+
+    if (result.acknowledged) {
+      res.send({
+        success: true,
+        message: "Advertise successfully",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Advertise fail!",
       });
   } catch (e) {
     console.log(e.message);
@@ -515,6 +557,58 @@ app.delete("/all-car/:id", async (req, res) => {
   } catch (e) {
     console.log(e.message);
   }
+});
+
+// Delete product from advertisement
+app.delete("/advertise/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log(id);
+    const query = { _id: ObjectId(id) };
+    const result = await advertiseCollection.deleteOne(query);
+    console.log(result);
+    console.log(result);
+
+    if (result.deletedCount) {
+      res.send({
+        success: true,
+        message: "Delete success from add board.",
+      });
+    } else
+      res.send({
+        success: false,
+        error: "Delete fail! from add board.",
+      });
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+// =================== ALL PUT METHOD==================
+app.put("/users/admin/:id", async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: ObjectId(id) };
+
+  const options = { upsert: true };
+
+  const updateDoc = {
+    $set: {
+      sellerStatus: "verified",
+    },
+  };
+  const result = await usersCollection.updateOne(filter, updateDoc, options);
+  console.log(result);
+
+  if (result.acknowledged) {
+    res.send({
+      success: true,
+      message: "User verify successfully",
+    });
+  } else
+    res.send({
+      success: false,
+      error: "User verify fail!",
+    });
 });
 
 app.get("/", (req, res) => {
