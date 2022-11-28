@@ -483,7 +483,7 @@ app.post("/advertise", async (req, res) => {
 });
 
 //  =================GET SINGLE USER FORM DATABASE ===================
-app.get("/users/:email", verifyToken, async (req, res) => {
+app.get("/users/:email", async (req, res) => {
   try {
     const email = req.params.email;
     const user = await usersCollection.findOne({ email });
@@ -494,7 +494,7 @@ app.get("/users/:email", verifyToken, async (req, res) => {
 });
 
 //  =================ALL DELETE METHOD ===================
-app.delete("/user-booking-information/:id", verifyToken, async (req, res) => {
+app.delete("/user-booking-information/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
@@ -517,7 +517,7 @@ app.delete("/user-booking-information/:id", verifyToken, async (req, res) => {
 });
 
 // delete user/ admin buyer, seller
-app.delete("/users/:id", verifyToken, async (req, res) => {
+app.delete("/users/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
@@ -540,7 +540,7 @@ app.delete("/users/:id", verifyToken, async (req, res) => {
 });
 
 // delete user from wishlist
-app.delete("/user-wishlist/:id", verifyToken, async (req, res) => {
+app.delete("/user-wishlist/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
@@ -563,7 +563,7 @@ app.delete("/user-wishlist/:id", verifyToken, async (req, res) => {
 });
 
 // delete user from report list
-app.delete("/user-report/:id", verifyToken, async (req, res) => {
+app.delete("/user-report/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
@@ -586,7 +586,7 @@ app.delete("/user-report/:id", verifyToken, async (req, res) => {
 });
 
 // delete my product from db
-app.delete("/all-elect/:id", verifyToken, async (req, res) => {
+app.delete("/all-elect/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
@@ -609,7 +609,7 @@ app.delete("/all-elect/:id", verifyToken, async (req, res) => {
 });
 
 // delete my product from db
-app.delete("/all-micro/:id", verifyToken, async (req, res) => {
+app.delete("/all-micro/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
@@ -632,7 +632,7 @@ app.delete("/all-micro/:id", verifyToken, async (req, res) => {
 });
 
 // delete my product from db (All Luxurious Car)
-app.delete("/all-car/:id", verifyToken, async (req, res) => {
+app.delete("/all-car/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
@@ -655,7 +655,7 @@ app.delete("/all-car/:id", verifyToken, async (req, res) => {
 });
 
 // Delete product from advertisement
-app.delete("/advertise/:id", verifyToken, async (req, res) => {
+app.delete("/advertise/:id", async (req, res) => {
   try {
     const id = req.params.id;
     // console.log(id);
@@ -680,7 +680,7 @@ app.delete("/advertise/:id", verifyToken, async (req, res) => {
 });
 
 // =================== ALL PUT METHOD==================
-app.put("/users/admin/:id", verifyToken, async (req, res) => {
+app.put("/users/admin/:id", async (req, res) => {
   const id = req.params.id;
   const filter = { _id: ObjectId(id) };
 
